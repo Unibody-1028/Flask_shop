@@ -14,7 +14,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = (f'{MYSQL_DIALECT}+{MYSQL_DRIVER}://{MYSQL_NAME}:{MYSQL_PWD}'
                                f'@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}?charset={MYSQL_CHARSET}')
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    SECRET_KEY = os.urandom(16)
+    SECRET_KEY = '5cadfc3798f47ece170d264ec653ffbd'
     PORT = 8088
 
 class DevelopmentConfig(Config):
