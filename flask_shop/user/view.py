@@ -42,6 +42,9 @@ class User(Resource):
         if existing_user:
             return {'status':10030,'msg':'该用户名已被注册,请更换'}
 
+        '''
+        用户注册流程优化
+        '''
         try:
             # 使用models内定义的User类创建对象
             usr = models.User(
