@@ -4,6 +4,8 @@ from flask_shop.user import user,user_api     # 导入蓝图,Api实例
 from flask_shop import models,db
 from flask_restful import Resource
 from flask_shop.utils.message import to_dict_msg
+from flask_shop.utils.tokens import generate_auth_token,verify_auth_token
+
 
 @user.route('/')
 def index():
@@ -84,11 +86,12 @@ def login():
     pwd = request.form.get('pwd')
 
     if not all([name,pwd]):
-        return {'status':10000,'msg':'数据不完整'}
+        return to_dict_msg(status=10002)
     if len(name) >1:
         usr = models.User.query.filter_by(name=name).first()
         if usr:
             if usr.check_password(pwd):
-                return {'status':200,'msg':'登录成功'}
+                token = generate_auth_token(usr.id,expiration=1000)
+                return to_dict_msg(status=200,data={'token':token})
 
-        return {'status':10001,'msg':'用户名或密码错误'}
+        return to_dict_msg(status=10001)
