@@ -2,7 +2,7 @@
 .venv/
 env/
 venv/
-
+shop_env/
 # 日志文件
 *.log
 
