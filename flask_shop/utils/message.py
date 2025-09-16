@@ -18,4 +18,5 @@ def to_dict_msg(status=200,data=None,msg=None):
         'msg':msg if msg else status_msg.get(status)
 
     }
-
+if __name__ == '__main__':
+    print(to_dict_msg(10000))
