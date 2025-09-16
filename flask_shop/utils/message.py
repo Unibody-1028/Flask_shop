@@ -1,0 +1,21 @@
+status_msg = {
+    200:'成功',
+    10000:'用户名、密码、确认密码不能为空',
+    10011:'用户名长度需要在1-32字符之间',
+    10012:'密码不能少于6位',
+    10013:'密码不一致',
+    10014:'手机号格式有误',
+    10015:'邮箱格式有误',
+    10030:'该用户名已被注册,请更换',
+    20000 :'服务器内部错误'
+}
+
+def to_dict_msg(status=200,data=None,msg=None):
+    return {
+        'status':status,
+        'data':data,
+        # 如果msg有值,则使用msg,否则根据状态码获取msg
+        'msg':msg if msg else status_msg.get(status)
+
+    }
+
