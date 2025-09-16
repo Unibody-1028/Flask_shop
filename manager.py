@@ -3,6 +3,7 @@ from flask_migrate import Migrate,MigrateCommand
 from flask_script import Manager
 
 
+
 app = create_app('develop')
 
 # 初始化命令管理器
