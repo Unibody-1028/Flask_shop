@@ -22,7 +22,6 @@ class User(db.Model,BaseModel):
     phone = db.Column(db.String(11))
     email = db.Column(db.String(32))
 
-
     # 密码属性访问器
     @property
     def password(self):

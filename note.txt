@@ -11,4 +11,4 @@ source shop_env/bin/activate
 # 查看端口占用 sudo lsof -i tcp:8088
 # 终止进程 sudo kill -9 PID
 
-
+pip freeze > requirements.txt

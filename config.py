@@ -1,6 +1,5 @@
 import os
 
-
 class Config:
     # 配置MYSQL参数
     MYSQL_DIALECT = 'mysql'
@@ -27,3 +26,5 @@ config_map={
     'develop':DevelopmentConfig,
     'product':ProductionConfig
 }
+
+
