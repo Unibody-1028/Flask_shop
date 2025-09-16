@@ -3,7 +3,7 @@ from flask import request
 from flask_shop.user import user,user_api     # 导入蓝图,Api实例
 from flask_shop import models,db
 from flask_restful import Resource
-
+from flask_shop.utils.message import to_dict_msg
 
 @user.route('/')
 def index():
@@ -25,26 +25,24 @@ class User(Resource):
         email = request.form.get('email','').strip()
         # 验证数据的正确性
         if not all([name,pwd,real_pwd]):
-            return {'status':10000, 'msg':'用户名、密码、确认密码不能为空'}
+            return to_dict_msg(10000)
         if len(name) < 1 or len(name)>16:
-            return {'status':10011,'msg':'用户名长度需要在1-32字符之间'}
+            return to_dict_msg(10011)
         if len(pwd) < 6 :
-            return {'status':10012, 'msg':'密码不能少于6位'}
+            return to_dict_msg(10012)
         if pwd != real_pwd:
-            return {'status':10013, 'msg':'密码不一致'}
-        if not re.match(r'1[3456789]\d{9}',phone):
-            return {'status':10014,'msg':'手机号格式有误'}
+            return to_dict_msg(10013)
+        if not re.match(r'^1[3456789]\d{9}$',phone):
+            return to_dict_msg(10014)
+        print(phone)
         if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$',email):
-            return {'status':10015,'msg':'邮箱格式有误'}
+            return to_dict_msg(10015)
         # 验证用户名是否已经存在
         existing_user = models.User.query.filter_by(name=name).first()
         # print(existing_user)
         if existing_user:
-            return {'status':10030,'msg':'该用户名已被注册,请更换'}
+            return to_dict_msg(10030)
 
-        '''
-        用户注册流程优化
-        '''
         try:
             # 使用models内定义的User类创建对象
             usr = models.User(
@@ -60,8 +58,8 @@ class User(Resource):
             db.session.rollback()
             # 记录错误日志
             print(f"注册失败：{str(e)}")
-            return {'status':2000, 'msg':'服务器内部错误'}
-        return '用户注册成功!!!'
+            return to_dict_msg(20000)
+        return to_dict_msg(status=200,msg='用户注册成功')
 
 
 
