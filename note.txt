@@ -70,3 +70,30 @@ git rm <文件名>	删除文件并添加到暂存区（如 git rm test.txt）
 git mv <旧文件名> <新文件名>	重命名文件并添加到暂存区（如 git mv old.js new.js）
 git config --global user.name "你的名字"	配置全局用户名（提交时显示）
 git config --global user.email "你的邮箱"	配置全局邮箱（提交时显示）
+
+
+1. 推荐方案：“合并后删除旧分支 + 新功能建新分支”
+具体操作流程
+在 main 分支合并 dev1（确保合并成功且代码测试无误）：
+bash
+# 切换到main分支
+git checkout main
+# 拉取最新代码（避免冲突）
+git pull origin main
+# 合并dev1分支
+git merge dev1
+# 推送合并后的main到远程（若需）
+git push origin main
+
+删除本地和远程的 dev1 分支（已完成使命，无保留必要）：
+bash
+# 删除本地dev1
+git branch -d dev1
+# 删除远程dev1（若远程也存在该分支）
+git push origin --delete dev1
+
+开发新功能时，从最新的 main 分支创建新分支（如 dev2）：
+bash
+git checkout main
+git pull origin main
+git checkout -b dev2  # 基于最新main创建新功能分支
