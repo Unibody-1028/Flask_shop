@@ -101,7 +101,7 @@ def login():
 
 
 @user.route('/get_user_info',methods=['GET'])
-@login_required
+@login_required # 等价于get_user_info = login_required(get_user_info)
 def get_user_info():
     name = request.form.get('name')
     pwd = request.form.get('pwd')
