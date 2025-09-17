@@ -4,7 +4,8 @@ from flask_shop.user import user,user_api     # 导入蓝图,Api实例
 from flask_shop import models,db
 from flask_restful import Resource
 from flask_shop.utils.message import to_dict_msg
-from flask_shop.utils.tokens import generate_auth_token,verify_auth_token
+from flask_shop.utils.tokens import generate_auth_token,login_required,verify_auth_token
+
 
 
 @user.route('/')
@@ -36,7 +37,7 @@ class User(Resource):
             return to_dict_msg(10013)
         if not re.match(r'^1[3456789]\d{9}$',phone):
             return to_dict_msg(10014)
-        print(phone)
+        # print(phone)
         if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$',email):
             return to_dict_msg(10015)
         # 验证用户名是否已经存在
@@ -81,6 +82,8 @@ user_api.add_resource(User,'/user')
 
 
 @user.route('/login',methods=['POST'])
+
+
 def login():
     name = request.form.get('name')
     pwd = request.form.get('pwd')
@@ -91,7 +94,25 @@ def login():
         usr = models.User.query.filter_by(name=name).first()
         if usr:
             if usr.check_password(pwd):
-                token = generate_auth_token(usr.id,expiration=1000)
+                token = generate_auth_token(usr.id,expiration=3600)
                 return to_dict_msg(status=200,data={'token':token})
 
         return to_dict_msg(status=10001)
+
+
+@user.route('/get_user_info',methods=['GET'])
+@login_required
+def get_user_info():
+    name = request.form.get('name')
+    pwd = request.form.get('pwd')
+    if not all([name,pwd]):
+        return to_dict_msg(status=10002)
+    if len(name) >1:
+        usr = models.User.query.filter_by(name=name).first()
+        if usr:
+            if usr.check_password(pwd):
+                token = request.headers.get('token')
+                if verify_auth_token(token) is not None:
+                    return to_dict_msg(status=200,msg='获取user信息成功')
+            return to_dict_msg(10004)
+
