@@ -82,35 +82,52 @@ user_api.add_resource(User,'/user')
 
 class UserList(Resource):
     '''
-    获取用户列表
-
+    获取用户API资源类
+    提供GET方法用于获取用户列表,支持条件查询和分页功能
     '''
     def get(selfs):
+        '''
+        处理GET请求,获取用户列表
+        支持通过name参数筛选用户,通过pnum和nsize实现分页
+        :return: 格式化的JSON响应,包括分页信息和用户列表数据
+        '''
+        # 初始化请求参数解析器,用于提取和验证url中的查询参数
         parser = reqparse.RequestParser()
-        parser.add_argument('name',type=str)
-        parser.add_argument('pnum',type=int)
-        parser.add_argument('nsize',type=int)
+        parser.add_argument('name',type=str)  # 用于用户名模糊查询
+        parser.add_argument('pnum',type=int)  # 指定当前页码
+        parser.add_argument('nsize',type=int) # 指定每页的记录数
         try:
+            # 解析请求参数
             args = parser.parse_args()
-            name = args.get('name')
-            pnum = args.get('pnum') if args.get('pnum') else 1
-            nsize = args.get('nsize') if args.get('psize') else 2
-
+            # 提取参数值，对可选参数设置默认值
+            name = args.get('name') # 默认为None
+            pnum = args.get('pnum') if args.get('pnum') else 1 # 默认值为1
+            nsize = args.get('nsize') if args.get('nsize') else 2 # 默认值为2
+            # 根据查询条件查询用户数据，并实现分页
             if name:
+                # 如果提供了name,就按照name进行模糊查询
+                # 使用paginate(pnum,nsize)实现分页
                 user_p = models.User.query.filter(models.User.name.like(f'%{name}%')).paginate(pnum,nsize)
             else:
+                # 若未提供name参数，查询所有用户并分页
                 user_p = models.User.query.paginate(pnum,nsize)
-
+            # 构造响应数据
             data = {
-                'pnum':pnum,
-                'totalPage':user_p.total,
-                'users':[u.to_dict() for u in user_p.items]
+                'pnum': pnum,  # 当前页码
+                'totalPage': user_p.total,  # 总记录数（来自分页对象）
+                # 将用户对象列表转换为字典列表（调用User模型的to_dict()方法）
+                'users': [u.to_dict() for u in user_p.items]
             }
+            # 返回成功响应（使用自定义函数格式化，状态码200表示成功）
             return to_dict_msg(200,data,'获取用户列表成功')
 
         except Exception as e:
+            # 捕获异常，打印错误信息并返回通用错误响应
             print(e)
             return to_dict_msg(10000)
+
+# 将UserList资源注册到用户API蓝图（user_api），并映射到URL路径'url_prefix/user_list'
+# 客户端可通过GET请求访问该路径获取用户列表
 user_api.add_resource(UserList,'/user_list')
 
 
