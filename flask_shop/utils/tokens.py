@@ -23,15 +23,9 @@ def verify_auth_token(token_str) -> User | None:
     s = Serializer(current_app.config['SECRET_KEY'])
     try:
         data = s.loads(token_str)
-    except SignatureExpired:
-        print("Token已过期")
-        return None
-    except BadSignature:
-        print("Token无效（可能被篡改）")
-        return None
     except Exception as e:
         print(f"Token验证失败：{str(e)}")
-        return None
+        return to_dict_msg(10004,msg='token无效或已过期')
 
     # 获取用户实例
     usr = User.query.filter_by(id=data['id']).first()
