@@ -2,7 +2,7 @@ import re
 from flask import request
 from flask_shop.user import user,user_api     # 导入蓝图,Api实例
 from flask_shop import models,db
-from flask_restful import Resource
+from flask_restful import Resource,reqparse
 from flask_shop.utils.message import to_dict_msg
 from flask_shop.utils.tokens import generate_auth_token,login_required,verify_auth_token
 
@@ -79,6 +79,40 @@ user_api.add_resource(User,'/user')
 如果发送POST请求:执行User.post()方法
 如果发送GET请求:执行User.get()方法
 '''
+
+class UserList(Resource):
+    '''
+    获取用户列表
+
+    '''
+    def get(selfs):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name',type=str)
+        parser.add_argument('pnum',type=int)
+        parser.add_argument('nsize',type=int)
+        try:
+            args = parser.parse_args()
+            name = args.get('name')
+            pnum = args.get('pnum') if args.get('pnum') else 1
+            nsize = args.get('nsize') if args.get('psize') else 2
+
+            if name:
+                user_p = models.User.query.filter(models.User.name.like(f'%{name}%')).paginate(pnum,nsize)
+            else:
+                user_p = models.User.query.paginate(pnum,nsize)
+
+            data = {
+                'pnum':pnum,
+                'totalPage':user_p.total,
+                'users':[u.to_dict() for u in user_p.items]
+            }
+            return to_dict_msg(200,data,'获取用户列表成功')
+
+        except Exception as e:
+            print(e)
+            return to_dict_msg(10000)
+user_api.add_resource(UserList,'/user_list')
+
 
 @user.route('/login',methods=['POST'])
 def login():
