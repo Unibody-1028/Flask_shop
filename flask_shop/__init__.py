@@ -19,9 +19,13 @@ def create_app(config_name):
     # 初始化app对象后,再绑定数据库
     db.init_app(app)
 
-    # 注册蓝图
+    # 注册user蓝图
     from flask_shop.user import user as user_bp
     app.register_blueprint(user_bp)
+
+    # 注册menu蓝图
+    from flask_shop.menu import menu as menu_bp
+    app.register_blueprint(menu_bp)
 
     return app
 
