@@ -7,14 +7,22 @@ from flask_shop.utils.message import to_dict_msg
 from flask_shop.utils.tokens import generate_auth_token,login_required,verify_auth_token
 
 
-
 @user.route('/')
 def index():
     return 'Hello_User'
 
 class User(Resource):
     def get(self):
-        pass
+        try:
+            id = int(request.args.get('id').strip()) # 获取id并将其转换为int类型
+            usr = models.User.query.filter_by(id=id).first()
+            if usr:
+                return to_dict_msg(200,usr.to_dict(),'获取用户信息成功')
+            else:
+                return to_dict_msg(200,[],'没有此用户')
+        except Exception as e:
+            print(e)
+            return to_dict_msg(10000)
 
     # 客户端发送POST请求到绑定的url时,自动执行此方法
     def post(self):
@@ -64,26 +72,15 @@ class User(Resource):
             return to_dict_msg(20000)
         return to_dict_msg(status=200,msg='用户注册成功')
 
-
-
-
-
-
-
-
 # 将User资源类与URL路径'/user'绑定
 user_api.add_resource(User,'/user')
 '''
 客户端访问http://域名/蓝图前缀/user时,
 如果发送POST请求:执行User.post()方法
 如果发送GET请求:执行User.get()方法
-
 '''
 
-
 @user.route('/login',methods=['POST'])
-
-
 def login():
     name = request.form.get('name')
     pwd = request.form.get('pwd')
@@ -98,7 +95,6 @@ def login():
                 return to_dict_msg(status=200,data={'token':token})
 
         return to_dict_msg(status=10001)
-
 
 @user.route('/get_user_info',methods=['GET'])
 @login_required # 等价于get_user_info = login_required(get_user_info)

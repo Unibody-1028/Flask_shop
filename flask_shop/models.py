@@ -46,6 +46,16 @@ class User(db.Model,BaseModel):
         '''
         return check_password_hash(self.pwd,t_pwd)
 
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'name':self.name,
+            'nick_name':self.nick_name,
+            'phone':self.phone,
+            'email':self.email
+        }
+
+
 class Menu(db.Model):
     '''
     菜单模型类,继承自SQLAlchemy的Model基类,用于存储系统中的菜单数据,支持层级结构,
