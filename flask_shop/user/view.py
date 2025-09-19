@@ -201,7 +201,7 @@ class UserList(Resource):
         except Exception as e:
             # 捕获异常，打印错误信息并返回通用错误响应
             print(e)
-            return to_dict_msg(status=10000)
+            return to_dict_msg(status=20000)
 
 # 将UserList资源注册到用户API蓝图（user_api），并映射到URL路径'url_prefix/user_list'
 # 客户端可通过GET请求访问该路径获取用户列表
