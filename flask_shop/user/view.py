@@ -99,23 +99,53 @@ class User(Resource):
 
     # 客户端发送PUT请求到'.../url_prefix/user',自动执行此方法
     def put(self):
+        '''
+        处理PUT请求:修改制定id用户的邮箱信息和手机号信息
+        :return: 成功:200状态码+修改成功信息提示
+                 失败:对应错误码
+        '''
         try:
+            # 处理并验证必填参数id
+            # 从请求体获取id字符串→去除前后空格→转换为整数(匹配数据库id字段类型)
             id = int(request.form.get('id').strip())
+            # 处理可选参数
+            # 如果前端传递了email/phone,则去除空格后使用,未设置则使用原参数
             email = request.form.get('email').strip() if request.form.get('email') else ''
             phone = request.form.get('phone').strip() if request.form.get('phone') else ''
-            # 根据id获取用户实例
+            # 根据id获取用户实例,不存在返回None
             usr = models.User.query.get(id)
+            # 判断用户是否存在,存在则执行修改
             if usr:
                 usr.email = email
                 usr.phone = phone
+                # 提交数据库事务,将内存中的修改同步到数据库
                 db.session.commit()
+                # 返回修改成功响应
                 return to_dict_msg(200,msg='修改数据成功!')
             else:
                 return to_dict_msg(10016)
         except Exception:
             return to_dict_msg(20002)
 
-
+    def delete(self):
+        '''
+        处理PUT请求:修改制定id用户的邮箱信息和手机号信息
+        :return: 成功:200状态码+删除用户成功提示
+                 失败:20002
+        '''
+        try:
+            # 从请求体获取id
+            id = int(request.form.get('id').strip())
+            # 根据id获取用户
+            usr = models.User.query.get(id)
+            if usr:
+                db.session.delete(usr)
+                db.session.commit()
+                return to_dict_msg(200,msg='删除用户成功!')
+            else:
+                return to_dict_msg(10017)
+        except Exception:
+            return to_dict_msg(20002,msg='删除操作异常')
 
 
 # 将User资源类与URL路径'/user'绑定
