@@ -42,6 +42,24 @@ class Role(Resource):
             return to_dict_msg(status=10018)
         except Exception as e:
             return to_dict_msg(20000)
+    # 更新角色信息成功
+    def put(self):
+        try:
+            id = int(request.form.get('id'))
+            name = request.form.get('name').strip() if request.form.get('name') else ''
+            desc = request.form.get('desc').strip() if request.form.get('desc') else ''
+            if name:
+                r = models.Role.query.get(id)
+                if not r:
+                    return to_dict_msg(20006,msg='修改的角色不存在')
+                r.name = name
+                r.desc = desc
+                db.session.commit()
+                return to_dict_msg(status=200,msg='更新角色信息成功')
+            return to_dict_msg(status=10002)
+        except Exception as e:
+            return to_dict_msg(20006)
+
 
 
 
