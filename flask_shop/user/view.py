@@ -127,15 +127,16 @@ class User(Resource):
         except Exception:
             return to_dict_msg(20002)
 
+    # 客户端发送DELETE请求到'.../url_prefix/user',自动执行此方法
     def delete(self):
         '''
-        处理PUT请求:修改制定id用户的邮箱信息和手机号信息
+        处理DELETE请求:删除用户
         :return: 成功:200状态码+删除用户成功提示
                  失败:20002
         '''
         try:
             # 从请求体获取id
-            id = int(request.form.get('id').strip())
+            id = int(request.args.get('id').strip())
             # 根据id获取用户
             usr = models.User.query.get(id)
             if usr:
@@ -272,4 +273,7 @@ def get_user_info():
                     return to_dict_msg(status=200,msg='获取user信息成功')
     # 获取用户信息失败,返回业务错误码
     return to_dict_msg(10004)
+
+
+
 
