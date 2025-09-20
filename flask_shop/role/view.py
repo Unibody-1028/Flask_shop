@@ -16,5 +16,19 @@ class Role(Resource):
         except Exception:
             return to_dict_msg(20004)
 
+    def post(self):
+        name = request.form.get('name')
+        desc = request.form.get('desc')
+        try:
+            if name:
+                role = models.Role(name=name,desc=desc)
+                db.session.add(role)
+                db.session.commit()
+                return to_dict_msg(status=200,msg='增加角色身份成功')
+            return to_dict_msg(status=10002)
+        except Exception as e:
+            print(e)
+            return to_dict_msg(status=20005)
+
 
 role_api.add_resource(Role,'/role')
