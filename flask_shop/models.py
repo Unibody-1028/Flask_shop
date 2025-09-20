@@ -105,3 +105,17 @@ class Menu(db.Model):
             data.append(o.to_dict())
         # 返回子菜单的字典列表
         return data
+
+
+class Role(db.Model):
+    __tablename__ = 't_role'
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(32),unique=True,nullable=False)
+    desc = db.Column(db.String(64))
+
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'name':self.name,
+            'desc':self.desc
+        }
