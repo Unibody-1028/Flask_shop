@@ -275,5 +275,18 @@ def get_user_info():
     return to_dict_msg(10004)
 
 
+# 重置用户密码接口
+@user.route('/reset',methods=['GET'])
+def reset():
+    try:
+        # 接收前端传递的id
+        id = int(request.args.get('id'))
+        # 根据id查找用户
+        usr = models.User.query.get(id)
+        usr.password = '123'
+        db.session.commit()
+        return to_dict_msg(200,msg='重置密码成功!')
+    except Exception:
+        return to_dict_msg(20003)
 
 
