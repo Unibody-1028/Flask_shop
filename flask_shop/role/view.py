@@ -7,6 +7,7 @@ from flask_shop.utils.message import to_dict_msg
 
 
 class Role(Resource):
+    # 获取角色列表
     def get(self):
         try:
             role_list = []
@@ -15,7 +16,7 @@ class Role(Resource):
             return to_dict_msg(200,data=role_list,msg='获取角色列表成功!!!')
         except Exception:
             return to_dict_msg(20004)
-
+    # 创建新角色
     def post(self):
         name = request.form.get('name')
         desc = request.form.get('desc')
@@ -24,11 +25,24 @@ class Role(Resource):
                 role = models.Role(name=name,desc=desc)
                 db.session.add(role)
                 db.session.commit()
-                return to_dict_msg(status=200,msg='增加角色身份成功')
+                return to_dict_msg(status=200,msg='增加角色成功')
             return to_dict_msg(status=10002)
         except Exception as e:
             print(e)
             return to_dict_msg(status=20005)
+    # 删除角色
+    def delete(self):
+        try:
+            id = int(request.form.get('id'))
+            r = models.Role.query.get(id)
+            if r: # 是否找到用户
+                db.session.delete(r)
+                db.session.commit()
+                return to_dict_msg(200,msg='删除角色成功')
+            return to_dict_msg(status=10018)
+        except Exception as e:
+            return to_dict_msg(20000)
+
 
 
 role_api.add_resource(Role,'/role')
