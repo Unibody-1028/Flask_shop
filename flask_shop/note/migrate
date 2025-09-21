@@ -1,0 +1,12 @@
+# 1. 备份当前数据库数据（重要！避免数据丢失）
+# 2. 删除迁移记录目录（会清除所有迁移历史，谨慎操作）
+rm -rf migrations/
+
+# 3. 重新初始化迁移环境
+python manager.py db init
+
+# 4. 重新生成迁移脚本（此时会检测到所有模型定义）
+python manager.py db migrate -m "初始化迁移（或描述你的修改）"
+
+# 5. 应用迁移到数据库
+python manager.py db upgrade
