@@ -61,6 +61,26 @@ class Role(Resource):
             return to_dict_msg(20006)
 
 
-
-
 role_api.add_resource(Role,'/role')
+
+
+@role.route('/del_menu/<int:rid>/<int:mid>')
+def del_menu(rid,mid):
+    try:
+        r = models.Role.query.get(rid)
+        m = models.Menu.query.get(mid)
+        if all([r,m]):
+            # 如果角色拥有该权限,则执行删除操作
+            if m in r.menus:
+                r.menus.remove(m)
+                if m.level ==1:
+                    for temp_m in m.children: # 遍历当前权限的所有子权限
+                        if temp_m in r.menus: # 判断当前角色是否拥有遍历到的子权限
+                            r.menus.remove(temp_m)
+                db.session.commit()
+                return to_dict_msg(200,msg='删除权限成功')
+
+        return to_dict_msg(10002,msg='删除失败,该角色没有此权限!!!')
+
+    except Exception as e:
+        return to_dict_msg(20000)
