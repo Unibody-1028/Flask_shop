@@ -137,7 +137,8 @@ class Role(db.Model):
     def get_menu_dict(self):
         menu_list = []  # 用于存储最终的层级菜单结构
         # 遍历当前角色拥有的所有菜单（self.menus 是多对多关联的菜单列表）
-        for m in self.menus:
+        menus = sorted(self.menus,key= lambda temp:temp.id) # 使用sorted函数对菜单进行排序,参数key指定排序规则
+        for m in menus:
             # 筛选出一级菜单（level=1）
             if m.level == 1:
                 # 调用菜单自身的 to_dict() 方法，获取基础信息（id、name、path等）
@@ -145,7 +146,7 @@ class Role(db.Model):
                 # 初始化一级菜单的 children 列表（用于存放它的二级菜单）
                 first_dict['children'] = []
                 # 再次遍历所有菜单，筛选当前一级菜单的二级菜单
-                for s in self.menus:
+                for s in menus:
                     # 二级菜单条件：level=2 且 父菜单id（pid）等于当前一级菜单的id
                     if s.level == 2 and s.pid == m.id:
                         # 将符合条件的二级菜单添加到一级菜单的 children 中
