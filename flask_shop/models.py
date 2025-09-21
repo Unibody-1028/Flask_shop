@@ -60,7 +60,12 @@ class User(db.Model,BaseModel):
             'role_name':self.role.name if (self.role is not None and self.role.name is not None) else ''
         }
 
+trm = db.Table('t_role_menu',
+    db.Column('rid',db.Integer,db.ForeignKey('t_role.id')),
+    db.Column('mid', db.Integer, db.ForeignKey('t_menu.id'))
 
+
+)
 class Menu(db.Model):
     '''
     菜单模型类,继承自SQLAlchemy的Model基类,用于存储系统中的菜单数据,支持层级结构,
@@ -78,6 +83,7 @@ class Menu(db.Model):
     # 子菜单列表：通过relationship定义与自身的关联，自动查询当前菜单的所有子菜单
     # 访问方式：menu.children 可获取当前菜单的所有子菜单实例
     children = db.relationship('Menu')
+    roles = db.relationship('Role',secondary=trm)
 
     def to_dict(self):
         """
@@ -118,10 +124,33 @@ class Role(db.Model):
     desc = db.Column(db.String(64))
 
     users = db.relationship('User',backref='role')
+    menus = db.relationship('Menu',secondary=trm)
 
     def to_dict(self):
         return {
             'id':self.id,
             'name':self.name,
-            'desc':self.desc
+            'desc':self.desc,
+            'menu':self.get_menu_dict()
         }
+
+    def get_menu_dict(self):
+        menu_list = []  # 用于存储最终的层级菜单结构
+        # 遍历当前角色拥有的所有菜单（self.menus 是多对多关联的菜单列表）
+        for m in self.menus:
+            # 筛选出一级菜单（level=1）
+            if m.level == 1:
+                # 调用菜单自身的 to_dict() 方法，获取基础信息（id、name、path等）
+                first_dict = m.to_dict()
+                # 初始化一级菜单的 children 列表（用于存放它的二级菜单）
+                first_dict['children'] = []
+                # 再次遍历所有菜单，筛选当前一级菜单的二级菜单
+                for s in self.menus:
+                    # 二级菜单条件：level=2 且 父菜单id（pid）等于当前一级菜单的id
+                    if s.level == 2 and s.pid == m.id:
+                        # 将符合条件的二级菜单添加到一级菜单的 children 中
+                        first_dict['children'].append(s.to_dict())
+                # 将整理好的一级菜单（含二级菜单）添加到结果列表
+                menu_list.append(first_dict)
+        # 返回最终的层级菜单结构
+        return menu_list
