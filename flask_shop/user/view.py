@@ -162,7 +162,7 @@ class UserList(Resource):
     获取用户API资源类
     提供GET方法用于获取用户列表,支持条件查询和分页功能
     '''
-    def get(selfs):
+    def get(self):
         '''
         处理GET请求,获取用户列表
         支持通过name参数筛选用户,通过pnum和nsize实现分页
