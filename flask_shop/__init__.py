@@ -27,6 +27,10 @@ def create_app(config_name):
     from flask_shop.menu import menu as menu_bp
     app.register_blueprint(menu_bp)
 
+    # 注册role蓝图
+    from flask_shop.role import role as role_bp
+    app.register_blueprint(role_bp)
+
     return app
 
 

@@ -16,7 +16,10 @@ Thumbs.db
 *.swp
 *.swo
 
+
+# .gitignore 内容
 __pycache__/
 *.pyc
-
-
+*.pyo
+*.pyd
+shop_env/  # 虚拟环境目录也建议忽略

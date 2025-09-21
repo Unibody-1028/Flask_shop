@@ -29,4 +29,4 @@ def index():
 if __name__ == '__main__':
     app.run(port=app.config['PORT'])
     # python manager.py runserver --port=8088
-    #manager.run()
+    # manager.run()

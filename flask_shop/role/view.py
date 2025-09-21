@@ -1,0 +1,86 @@
+from flask import request
+from flask_shop.role import role,role_api    # 导入蓝图,Api实例
+from flask_shop import models,db
+from flask_restful import Resource
+from flask_shop.utils.message import to_dict_msg
+
+
+
+class Role(Resource):
+    # 获取角色列表
+    def get(self):
+        try:
+            role_list = []
+            roles = models.Role.query.all()
+            role_list = [r.to_dict() for r in roles ]
+            return to_dict_msg(200,data=role_list,msg='获取角色列表成功!!!')
+        except Exception:
+            return to_dict_msg(20004)
+    # 创建新角色
+    def post(self):
+        name = request.form.get('name')
+        desc = request.form.get('desc')
+        try:
+            if name:
+                role = models.Role(name=name,desc=desc)
+                db.session.add(role)
+                db.session.commit()
+                return to_dict_msg(status=200,msg='增加角色成功')
+            return to_dict_msg(status=10002)
+        except Exception as e:
+            print(e)
+            return to_dict_msg(status=20005)
+    # 删除角色
+    def delete(self):
+        try:
+            id = int(request.form.get('id'))
+            r = models.Role.query.get(id)
+            if r: # 是否找到用户
+                db.session.delete(r)
+                db.session.commit()
+                return to_dict_msg(200,msg='删除角色成功')
+            return to_dict_msg(status=10018)
+        except Exception as e:
+            return to_dict_msg(20000)
+    # 更新角色信息成功
+    def put(self):
+        try:
+            id = int(request.form.get('id'))
+            name = request.form.get('name').strip() if request.form.get('name') else ''
+            desc = request.form.get('desc').strip() if request.form.get('desc') else ''
+            if name:
+                r = models.Role.query.get(id)
+                if not r:
+                    return to_dict_msg(20006,msg='修改的角色不存在')
+                r.name = name
+                r.desc = desc
+                db.session.commit()
+                return to_dict_msg(status=200,msg='更新角色信息成功')
+            return to_dict_msg(status=10002)
+        except Exception as e:
+            return to_dict_msg(20006)
+
+
+role_api.add_resource(Role,'/role')
+
+
+@role.route('/del_menu/<int:rid>/<int:mid>')
+def del_menu(rid,mid):
+    try:
+        r = models.Role.query.get(rid)
+        m = models.Menu.query.get(mid)
+        if all([r,m]):
+            # 如果角色拥有该权限,则执行删除操作
+            if m in r.menus:
+                r.menus.remove(m)
+                if m.level ==1:
+                    for temp_m in m.children: # 遍历当前权限的所有子权限
+                        if temp_m in r.menus: # 判断当前角色是否拥有遍历到的子权限
+                            r.menus.remove(temp_m)
+                db.session.commit()
+                return to_dict_msg(200,r.get_menu_dict(),msg='删除权限成功')
+
+        return to_dict_msg(10002,msg='删除失败,该角色没有此权限!!!')
+
+    except Exception as e:
+        return to_dict_msg(20000)

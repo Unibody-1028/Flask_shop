@@ -1,4 +1,5 @@
 # db 是 Flask-SQLAlchemy 的数据库实例，用于定义模型和操作数据库
+
 from flask_shop import db
 # generate_password_hash: 用于将明文密码加密为哈希值
 # check_password_hash: 用于验证明文密码与哈希值是否匹配
@@ -21,6 +22,8 @@ class User(db.Model,BaseModel):
     nick_name = db.Column(db.String(32))
     phone = db.Column(db.String(11))
     email = db.Column(db.String(32))
+
+    rid = db.Column(db.Integer,db.ForeignKey('t_role.id'))
 
     # 密码属性访问器
     @property
@@ -46,6 +49,23 @@ class User(db.Model,BaseModel):
         '''
         return check_password_hash(self.pwd,t_pwd)
 
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'name':self.name,
+            'nick_name':self.nick_name,
+            'phone':self.phone,
+            'email':self.email,
+            # 先确保self.role不为None，再判断name不为None
+            'role_name':self.role.name if (self.role is not None and self.role.name is not None) else ''
+        }
+
+trm = db.Table('t_role_menu',
+    db.Column('rid',db.Integer,db.ForeignKey('t_role.id')),
+    db.Column('mid', db.Integer, db.ForeignKey('t_menu.id'))
+
+
+)
 class Menu(db.Model):
     '''
     菜单模型类,继承自SQLAlchemy的Model基类,用于存储系统中的菜单数据,支持层级结构,
@@ -54,8 +74,7 @@ class Menu(db.Model):
     __tablename__ = 't_menu'
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(32),unique=True,nullable=False)
-    # 菜单层级：整数类型，不能为空（用于区分一级菜单、二级菜单等，如1=一级，2=二级）
-    level = db.Column(db.Integer,nullable=False)
+    level = db.Column(db.Integer)
     # 菜单路径：字符串类型，最大长度32（通常对应前端路由路径，如'/user'）
     path = db.Column(db.String(32))
     # 若为顶级菜单，pid为null
@@ -64,6 +83,7 @@ class Menu(db.Model):
     # 子菜单列表：通过relationship定义与自身的关联，自动查询当前菜单的所有子菜单
     # 访问方式：menu.children 可获取当前菜单的所有子菜单实例
     children = db.relationship('Menu')
+    roles = db.relationship('Role',secondary=trm)
 
     def to_dict(self):
         """
@@ -95,3 +115,43 @@ class Menu(db.Model):
             data.append(o.to_dict())
         # 返回子菜单的字典列表
         return data
+
+
+class Role(db.Model):
+    __tablename__ = 't_role'
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(32),unique=True,nullable=False)
+    desc = db.Column(db.String(64))
+
+    users = db.relationship('User',backref='role')
+    menus = db.relationship('Menu',secondary=trm)
+
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'name':self.name,
+            'desc':self.desc,
+            'menu':self.get_menu_dict()
+        }
+
+    def get_menu_dict(self):
+        menu_list = []  # 用于存储最终的层级菜单结构
+        # 遍历当前角色拥有的所有菜单（self.menus 是多对多关联的菜单列表）
+        menus = sorted(self.menus,key= lambda temp:temp.id) # 使用sorted函数对菜单进行排序,参数key指定排序规则
+        for m in menus:
+            # 筛选出一级菜单（level=1）
+            if m.level == 1:
+                # 调用菜单自身的 to_dict() 方法，获取基础信息（id、name、path等）
+                first_dict = m.to_dict()
+                # 初始化一级菜单的 children 列表（用于存放它的二级菜单）
+                first_dict['children'] = []
+                # 再次遍历所有菜单，筛选当前一级菜单的二级菜单
+                for s in menus:
+                    # 二级菜单条件：level=2 且 父菜单id（pid）等于当前一级菜单的id
+                    if s.level == 2 and s.pid == m.id:
+                        # 将符合条件的二级菜单添加到一级菜单的 children 中
+                        first_dict['children'].append(s.to_dict())
+                # 将整理好的一级菜单（含二级菜单）添加到结果列表
+                menu_list.append(first_dict)
+        # 返回最终的层级菜单结构
+        return menu_list

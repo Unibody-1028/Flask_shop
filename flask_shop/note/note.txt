@@ -97,3 +97,13 @@ git push origin --delete dev1
 git checkout main
 git pull origin main
 git checkout -b dev2  # 基于最新main创建新功能分支
+
+
+
+mysql启动
+sudo /usr/local/mysql/support-files/mysql.server start
+
+
+
+sudo lsof -i tcp:8088
+sudo kill -9 3210
