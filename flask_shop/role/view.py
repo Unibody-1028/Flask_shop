@@ -78,7 +78,7 @@ def del_menu(rid,mid):
                         if temp_m in r.menus: # 判断当前角色是否拥有遍历到的子权限
                             r.menus.remove(temp_m)
                 db.session.commit()
-                return to_dict_msg(200,msg='删除权限成功')
+                return to_dict_msg(200,r.get_menu_dict(),msg='删除权限成功')
 
         return to_dict_msg(10002,msg='删除失败,该角色没有此权限!!!')
 
