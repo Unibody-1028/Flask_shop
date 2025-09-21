@@ -1,4 +1,6 @@
 # db 是 Flask-SQLAlchemy 的数据库实例，用于定义模型和操作数据库
+from sqlalchemy.orm import backref
+
 from flask_shop import db
 # generate_password_hash: 用于将明文密码加密为哈希值
 # check_password_hash: 用于验证明文密码与哈希值是否匹配
@@ -21,6 +23,8 @@ class User(db.Model,BaseModel):
     nick_name = db.Column(db.String(32))
     phone = db.Column(db.String(11))
     email = db.Column(db.String(32))
+
+    rid = db.Column(db.Integer,db.ForeignKey('t_role.id'))
 
     # 密码属性访问器
     @property
@@ -112,6 +116,9 @@ class Role(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(32),unique=True,nullable=False)
     desc = db.Column(db.String(64))
+
+    users = db.relationship('User',backref('role'))
+
 
     def to_dict(self):
         return {
