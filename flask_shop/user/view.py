@@ -80,13 +80,16 @@ class User(Resource):
             return to_dict_msg(10030)
 
         try:
+            rid = int(request.form.get('role_name')) if request.form.get('role_name') else 0
             # 使用models内定义的User类创建对象
             usr = models.User(
                 name=name,
                 password=pwd, # 设置密码时会自动触发User的password.setter实现自动加密
                 phone=phone,
                 email=email,
-                nick_name=nick_name)
+                nick_name=nick_name,
+                rid = rid
+            )
             db.session.add(usr) # 添加到会话
             db.session.commit() # 提交事务(保存到数据库)
         except Exception as e:
@@ -112,12 +115,14 @@ class User(Resource):
             # 如果前端传递了email/phone,则去除空格后使用,未设置则使用原参数
             email = request.form.get('email').strip() if request.form.get('email') else ''
             phone = request.form.get('phone').strip() if request.form.get('phone') else ''
+            rid = int(request.form.get('role_name')) if request.form.get('role_name') else 0
             # 根据id获取用户实例,不存在返回None
             usr = models.User.query.get(id)
             # 判断用户是否存在,存在则执行修改
             if usr:
                 usr.email = email
                 usr.phone = phone
+                usr.rid = rid
                 # 提交数据库事务,将内存中的修改同步到数据库
                 db.session.commit()
                 # 返回修改成功响应
