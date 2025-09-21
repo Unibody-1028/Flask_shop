@@ -1,5 +1,4 @@
 # db 是 Flask-SQLAlchemy 的数据库实例，用于定义模型和操作数据库
-from sqlalchemy.orm import backref
 
 from flask_shop import db
 # generate_password_hash: 用于将明文密码加密为哈希值
@@ -56,7 +55,9 @@ class User(db.Model,BaseModel):
             'name':self.name,
             'nick_name':self.nick_name,
             'phone':self.phone,
-            'email':self.email
+            'email':self.email,
+            # 先确保self.role不为None，再判断name不为None
+            'role_name':self.role.name if (self.role is not None and self.role.name is not None) else ''
         }
 
 
@@ -68,8 +69,7 @@ class Menu(db.Model):
     __tablename__ = 't_menu'
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(32),unique=True,nullable=False)
-    # 菜单层级：整数类型，不能为空（用于区分一级菜单、二级菜单等，如1=一级，2=二级）
-    level = db.Column(db.Integer,nullable=False)
+    level = db.Column(db.Integer)
     # 菜单路径：字符串类型，最大长度32（通常对应前端路由路径，如'/user'）
     path = db.Column(db.String(32))
     # 若为顶级菜单，pid为null
@@ -117,8 +117,7 @@ class Role(db.Model):
     name = db.Column(db.String(32),unique=True,nullable=False)
     desc = db.Column(db.String(64))
 
-    users = db.relationship('User',backref('role'))
-
+    users = db.relationship('User',backref='role')
 
     def to_dict(self):
         return {
