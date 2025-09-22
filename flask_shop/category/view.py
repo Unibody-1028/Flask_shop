@@ -18,7 +18,10 @@ class Category(Resource):
             # 从表单获取并处理name,level,pid参数
             name = request.form.get('name').strip() if request.form.get('name').strip() else ''
             level = int(request.form.get('level').strip()) if request.form.get('level').strip() else None
-            pid = int(request.form.get('pid').strip()) if request.form.get('pid') else None
+            if int(request.form.get('pid')) !=0:
+                pid = int(request.form.get('pid'))
+            else:
+                pid = None
             # 验证name和level是否都存在
             if all([name,level]):
                 # 使用表单传递的数据创建新的Category对象
