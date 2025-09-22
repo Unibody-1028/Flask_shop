@@ -11,9 +11,9 @@ class BaseModel:
     update_time = db.Column(db.DateTime,default=datetime.now,onupdate=datetime.now)
 
 class User(db.Model,BaseModel):
-    '''用户模型类,继承自db.Model(SQLAlchemy的模型基类)
+    """用户模型类,继承自db.Model(SQLAlchemy的模型基类)
     对应数据库中的't_user'表,存储用户的基本信息
-    '''
+    """
     # 定义数据库表名和表字段
     __tablename__ = 't_user'
     id = db.Column(db.Integer,primary_key=True)
@@ -28,25 +28,25 @@ class User(db.Model,BaseModel):
     # 密码属性访问器
     @property
     def password(self):
-        '''通过password属性获取密码
+        """通过password属性获取密码
         :return:返回存储的哈希值
-        '''
+        """
         return self.pwd
 
     # 密码设置器
     @password.setter
     def password(self,t_pwd):
-        '''设置密码时自动加密,当执行user.password = '明文密码'时,会自动调用该方法,将明文密码通过
+        """设置密码时自动加密,当执行user.password = '明文密码'时,会自动调用该方法,将明文密码通过
         generate_password_hash加密后存入pwd
         :param t_pwd:用户输入的明文密码
-        '''
+        """
         self.pwd = generate_password_hash(t_pwd)
 
     def check_password(self,t_pwd):
-        '''验证明文密码与存储的哈希值是否匹配
+        """验证明文密码与存储的哈希值是否匹配
         :param t_pwd:需要验证的明文密码
         :return:bool:匹配返回True,不匹配返回False
-        '''
+        """
         return check_password_hash(self.pwd,t_pwd)
 
     def to_dict(self):
@@ -67,10 +67,10 @@ trm = db.Table('t_role_menu',
 
 )
 class Menu(db.Model):
-    '''
+    """
     菜单模型类,继承自SQLAlchemy的Model基类,用于存储系统中的菜单数据,支持层级结构,
     对应的数据库表名为't_menu'
-    '''
+    """
     __tablename__ = 't_menu'
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(32),unique=True,nullable=False)
@@ -155,3 +155,19 @@ class Role(db.Model):
                 menu_list.append(first_dict)
         # 返回最终的层级菜单结构
         return menu_list
+class Category(db.Model):
+    __tablename__ = 't_category'
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(32),nullable=False)
+    level = db.Column(db.Integer)
+    pid = db.Column(db.Integer,db.ForeignKey('t_category.id'))
+
+    children = db.relationship('Category')
+
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'name':self.name,
+            'level':self.level,
+            'pid':self.pid
+        }

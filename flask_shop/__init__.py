@@ -31,6 +31,10 @@ def create_app(config_name):
     from flask_shop.role import role as role_bp
     app.register_blueprint(role_bp)
 
+    # 注册category蓝图
+    from flask_shop.category import category as category_bp
+    app.register_blueprint(category_bp)
+
     return app
 
 
