@@ -242,7 +242,7 @@ def login():
                 # 密码验证通过则生成token
                 token = generate_auth_token(usr.id,expiration=3600)
                 # 返回成功响应
-                return to_dict_msg(status=200,data={'token':token})
+                return to_dict_msg(status=200,data={'token':token},msg='登录成功')
         # 错误响应
         return to_dict_msg(status=10001)
 
