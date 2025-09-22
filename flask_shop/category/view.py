@@ -124,8 +124,18 @@ def get_category_list():
 
     # 如果pnum,prize都不为空,则进行分页查询
     if all([pnum,psize]):
-
-        pass
+        categories = base_query.paginate(pnum,psize)
+        if level:
+            cate_list = get_tree(categories.items,level,True)
+        else:
+            cate_list = get_tree(categories.items,level,False)
+        data = {
+            'data':cate_list,
+            'pnum':pnum,
+            'psize':psize,
+            'total':categories.total
+        }
+        return to_dict_msg(200,data=data,msg='获取商品分类列表成功')
     # 否则进行不分页查询
     else:
         # 查询并存储所有的一级分类
@@ -156,7 +166,6 @@ def get_category_list():
             #     cate_list.append()
 
         return to_dict_msg(200,{'data':cate_list},msg='获取商品分类列表成功')
-    return 'Hello'
 
 
 def get_tree(info_list,level,flag):
