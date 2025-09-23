@@ -237,6 +237,31 @@ class Attribute(Resource):
             print(e)
             return to_dict_msg(20000)
 
+    def put(self):
 
+        try:
+            id = int(request.form.get('id'))
+            name = request.form.get('name')
+            val = request.form.get('val')
+            cid = int(request.form.get('cid'))
+            if all([id, cid, name]):
+                attr = models.Attribute.query.get(id)
+                if attr:
+                    if name:
+                        attr.name = name
+                    if val:
+                        attr.val = val
+                    if cid:
+                        attr.cid = cid
+                    db.session.commit()
+                    return to_dict_msg(200, msg='更新商品详细信息成功')
+                else:
+                    return to_dict_msg(10019)
+            else:
+                return to_dict_msg(10002)
+
+        except Exception as e:
+            print(e)
+            return to_dict_msg(20000)
 attribute_api.add_resource(Attribute,'/attribute')
 
