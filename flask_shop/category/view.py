@@ -279,3 +279,23 @@ class Attribute(Resource):
 
 attribute_api.add_resource(Attribute,'/attribute')
 
+@attribute.route('/attr_list')
+def get_attr_list():
+    cid = request.args.get('cid')
+    _type = request.args.get('type')
+    if all([cid,_type]):
+        cate = models.Category.query.get(cid)
+        attr_list = []
+        if cate:
+            if _type == 'static':
+                attr_list = [a.to_dict() for a in cate.attrs if a._type == 'static']
+            else:
+                attr_list = [a.to_dict() for a in cate.attrs if a._type == 'dynamic']
+            return to_dict_msg(200,attr_list,msg='获取商品详细信息列表成功')
+        else:
+            return to_dict_msg(10019)
+    else:
+        return to_dict_msg(10002)
+
+
+
