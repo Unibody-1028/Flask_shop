@@ -35,6 +35,10 @@ def create_app(config_name):
     from flask_shop.category import category as category_bp
     app.register_blueprint(category_bp)
 
+    # 注册attribute蓝图
+    from flask_shop.category import attribute as attribute_bp
+    app.register_blueprint(attribute_bp)
+
     return app
 
 

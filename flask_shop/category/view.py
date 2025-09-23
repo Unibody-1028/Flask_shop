@@ -1,5 +1,6 @@
 from flask import request
 from flask_shop.category import category,category_api    # 导入蓝图,Api实例
+from flask_shop.category import attribute,attribute_api
 from flask_shop import models,db
 from flask_restful import Resource
 from flask_shop.utils.message import to_dict_msg
@@ -202,4 +203,40 @@ def get_tree(info_list,level,flag):
             info_dict.append(i_dict)
     # 返回最终的嵌套层级结构
     return info_dict
+
+class Attribute(Resource):
+    def post(self):
+        try:
+            print("所有键名:", list(request.form.keys()))
+            name = request.form.get('name')
+            cid = request.form.get('cid')
+            val = request.form.get('val')
+            _type = request.form.get('type')
+
+            if all([name,cid,_type]):
+                if val:
+                    attr = models.Attribute(name=name,cid=cid,_type=_type,val=val)
+                else:
+                    attr = models.Attribute(name=name, cid=cid, _type=_type)
+                db.session.add(attr)
+                db.session.commit()
+                return to_dict_msg(200,msg='增加商品详细信息成功')
+            else:
+                return to_dict_msg(10002)
+        except Exception as e:
+            return to_dict_msg(20000)
+    def get(self):
+        try:
+            id = request.args.get('id')
+            attr = models.Attribute.query.get(id)
+            if attr:
+                return to_dict_msg(200,data=attr.to_dict(),msg='获取商品详细信息成功')
+            else:
+                return to_dict_msg(10019)
+        except Exception as e:
+            print(e)
+            return to_dict_msg(20000)
+
+
+attribute_api.add_resource(Attribute,'/attribute')
 
