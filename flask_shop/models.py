@@ -1,5 +1,5 @@
 # db 是 Flask-SQLAlchemy 的数据库实例，用于定义模型和操作数据库
-from sqlalchemy.orm import backref
+from sqlalchemy.orm import backref, foreign
 
 from flask_shop import db
 # generate_password_hash: 用于将明文密码加密为哈希值
@@ -191,3 +191,40 @@ class Attribute(db.Model):
             'type':self._type
         }
 
+
+class Goods(db.Model):
+    __tablename__ = 't_goods'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(512))
+    price = db.Column(db.Float)
+    number = db.Column(db.Integer)
+    introduce = db.Column(db.Text)
+    big_log = db.Column(db.String(256))
+    small_log = db.Column(db.String(256))
+    status = db.Column(db.Integer)  # 商品审核状态 0:未通过  1:审核中  2:已审核
+    is_promote = db.Column(db.Integer)  # 是否促销
+    hot_number = db.Column(db.Integer)
+    weight = db.Column(db.Integer)
+    cid_one = db.Column(db.Integer, db.ForeignKey('t_category.id'))
+    cid_two = db.Column(db.Integer, db.ForeignKey('t_category.id'))
+    cid_three = db.Column(db.Integer, db.ForeignKey('t_category.id'))
+
+    category = db.relationship("Category",foreign_keys=[cid_three])
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'name':self.name,
+            'price':self.price,
+            'number':self.number,
+            'introduce':self.introduce,
+            'big_log':self.big_log,
+            'small_log':self.small_log,
+            'status':self.status,
+            'is_promote':self.is_promote,
+            'hot_number':self.hot_number,
+            'weight':self.weight,
+            'cid_one':self.cid_one,
+            'cid_two':self.cid_two,
+            'cid_three':self.cid_three,
+            'attrs':[a.to_dict() for a in self.category.attrs]
+        }
