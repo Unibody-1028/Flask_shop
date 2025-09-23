@@ -1,4 +1,5 @@
 # db 是 Flask-SQLAlchemy 的数据库实例，用于定义模型和操作数据库
+from sqlalchemy.orm import backref
 
 from flask_shop import db
 # generate_password_hash: 用于将明文密码加密为哈希值
@@ -163,7 +164,7 @@ class Category(db.Model):
     pid = db.Column(db.Integer,db.ForeignKey('t_category.id'))
 
     children = db.relationship('Category')
-
+    attrs = db.relationship('Attribute',backref='category')
     def to_dict(self):
         return {
             'id':self.id,
@@ -171,3 +172,22 @@ class Category(db.Model):
             'level':self.level,
             'pid':self.pid
         }
+
+
+class Attribute(db.Model):
+    __tablename__ = 't_attribute'
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(32))
+    val = db.Column(db.String(255))
+    cid = db.Column(db.Integer,db.ForeignKey('t_category.id'))
+    _type = db.Column(db.Enum('static','dynamic'))
+
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'name':self.name,
+            'val':self.val,
+            'cid':self.cid,
+            'type':self._type
+        }
+
