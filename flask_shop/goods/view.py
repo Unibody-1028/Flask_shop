@@ -25,7 +25,7 @@ def get_goods_list():
 class Goods(Resource):
     def delete(self):
         try:
-            id = request.form.get('id')
+            id = request.json.get('id')
             goods = models.Goods.query.get(id)
             if goods:
                 db.session.delete(goods)
