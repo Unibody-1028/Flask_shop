@@ -263,5 +263,19 @@ class Attribute(Resource):
         except Exception as e:
             print(e)
             return to_dict_msg(20000)
+
+    def delete(self):
+        try:
+            id = request.form.get('id')
+            attr = models.Attribute.query.get(id)
+            if attr:
+                db.session.delete(attr)
+                db.session.commit()
+                return to_dict_msg(200,msg='删除商品详细信息成功')
+            else:
+                return to_dict_msg(10019,msg='商品详细信息不存在')
+        except Exception as e:
+            return to_dict_msg(20000)
+
 attribute_api.add_resource(Attribute,'/attribute')
 
