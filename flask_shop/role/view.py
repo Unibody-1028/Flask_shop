@@ -63,7 +63,7 @@ class Role(Resource):
 
 role_api.add_resource(Role,'/role')
 
-
+# 删除权限接口
 @role.route('/del_menu/<int:rid>/<int:mid>')
 def del_menu(rid,mid):
     try:
@@ -84,3 +84,32 @@ def del_menu(rid,mid):
 
     except Exception as e:
         return to_dict_msg(20000)
+
+@role.route('/set_menu/<int:rid>',methods=['POST'])
+# 分配权限接口
+def set_menu(rid):
+    try:
+        role = models.Role.query.get(rid)
+        mids = request.form.get('mids')
+        if mids is None:
+            return to_dict_msg(10002,msg='请传递mids')
+        # 如果角色存在
+        if role:
+            # 先将角色的权限清空
+            role.menus = []
+            # 再根据前端传入的权限设置权限
+            for m in mids.split(','):
+                if m:
+                    temp_menu = models.Menu.query.get(int(m))
+                    if temp_menu:
+                        role.menus.append(temp_menu)
+            db.session.commit()
+            return to_dict_msg(200,msg='权限分配成功!')
+        return to_dict_msg(20000,msg='修改的角色不存在')
+    except Exception as e:
+        print(e)
+        return to_dict_msg(20000)
+
+
+
+
