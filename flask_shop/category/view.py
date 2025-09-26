@@ -297,5 +297,18 @@ def get_attr_list():
     else:
         return to_dict_msg(10002)
 
-
-
+from sqlalchemy import func
+@category.route('/cate_group_level')
+def get_cate_group_by_level():
+    """
+    查询数据库中所有分类，按 level 字段分组，统计每个级别的分类数量，
+    并且只保留 level > 0 的分组，最后将结果以标准化格式返回给客户端。
+    """
+    group_data = (db.session.query(models.Category.level,func.count(1).label('count')).
+                  group_by(models.Category.level).having(models.Category.level>0).all())
+    data = {
+        'name':'数量',
+        'xAxis':[f'{g[0]}级分类' for g in group_data],
+        'series_data':[g[1] for g in group_data]
+    }
+    return to_dict_msg(200,data=data,msg='获取统计数据成功')
