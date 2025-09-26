@@ -257,8 +257,23 @@ class Order(db.Model,BaseModel):
     fapiao_content = db.Column(db.String(512))
     addrs = db.Column(db.String(512))
 
+    user = db.relationship('User',foreign_keys=[uid])
     order_detail = db.relationship('OrderDeatil',backref='order')
     express = db.relationship('Express',backref='order')
+
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'uid':self.uid,
+            'uname':self.user.name,
+            'price':self.price,
+            'number':self.number,
+            'pay_status':self.pay_status,
+            'is_send':self.is_send,
+            'fapiao_title':self.fapiao_title,
+            'fapiao_content':self.fapiao_content,
+            'addrs':self.addrs
+        }
 
 
 class OrderDeatil(db.Model):
