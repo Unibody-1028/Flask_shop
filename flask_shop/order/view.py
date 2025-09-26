@@ -25,7 +25,7 @@ def get_express():
     if oid:
         exps = models.Express.query.filter((models.Express.oid == oid)).order_by(models.Express.update_time.desc()).all()
         if exps:
-            return to_dict_msg(200,data=[e.to_dict() for e in exps])
+            return to_dict_msg(200,data=[e.to_dict() for e in exps],msg='获取物流信息成功')
         else:
             return to_dict_msg(200,msg='数据不存在')
     else:
