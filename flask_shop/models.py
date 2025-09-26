@@ -228,3 +228,17 @@ class Goods(db.Model):
             'cid_three':self.cid_three,
             'attrs':[a.to_dict() for a in self.category.attrs]
         }
+
+class Picture(db.Model):
+    __tablename__ = 't_picture'
+    id = db.Column(db.Integer,primary_key=True)
+    path = db.String(db.String(512))
+    gid = db.Column(db.Integer,db.ForeignKey('t_goods.id'))
+
+class GoodsAttr(db.Model):
+    __tablename__ = 't_goods_attr'
+    gid = db.Column(db.Integer,db.ForeignKey('t_goods.id'),primary_key=True)
+    aid = db.Column(db.Integer,db.ForeignKey('t_attribute.id'),primary_key=True)
+
+    val = db.Column(db.String(512))
+    _type = db.Column(db.String(8))
