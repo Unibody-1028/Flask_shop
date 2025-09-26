@@ -23,3 +23,4 @@ __pycache__/
 *.pyo
 *.pyd
 shop_env/  # 虚拟环境目录也建议忽略
+/flask_shop/static/

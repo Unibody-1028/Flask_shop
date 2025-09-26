@@ -16,6 +16,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SECRET_KEY = '5cadfc3798f47ece170d264ec653ffbd'
     PORT = 8088
+    ALLOWED_IMGS = set(['jepg','jpg','png'])
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    SERVER_IMG_UPLOADS = os.path.join(BASE_DIR,'flask_shop','static','img')
 
 class DevelopmentConfig(Config):
     DEBUG = True

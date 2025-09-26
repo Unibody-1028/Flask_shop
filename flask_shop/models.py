@@ -228,3 +228,73 @@ class Goods(db.Model):
             'cid_three':self.cid_three,
             'attrs':[a.to_dict() for a in self.category.attrs]
         }
+
+class Picture(db.Model):
+    __tablename__ = 't_picture'
+    id = db.Column(db.Integer,primary_key=True)
+    path = db.Column(db.String(512))
+    gid = db.Column(db.Integer,db.ForeignKey('t_goods.id'))
+
+class GoodsAttr(db.Model):
+    __tablename__ = 't_goods_attr'
+    gid = db.Column(db.Integer,db.ForeignKey('t_goods.id'),primary_key=True)
+    aid = db.Column(db.Integer,db.ForeignKey('t_attribute.id'),primary_key=True)
+
+    val = db.Column(db.String(512))
+    _type = db.Column(db.String(8))
+
+class Order(db.Model,BaseModel):
+    __tablename__ = 't_order'
+    id = db.Column(db.Integer,primary_key=True)
+    uid = db.Column(db.Integer,db.ForeignKey('t_user.id'))
+    price = db.Column(db.Float)
+
+    number = db.Column(db.Integer)
+    pay_status = db.Column(db.Integer) #0:未支付,1:已支付
+    is_send = db.Column(db.Integer) # 0:未发货,1:已发货
+    fapiao_title = db.Column(db.String(32))
+    fapiao_company = db.Column(db.String(128))
+    fapiao_content = db.Column(db.String(512))
+    addrs = db.Column(db.String(512))
+
+    user = db.relationship('User',foreign_keys=[uid])
+    order_detail = db.relationship('OrderDeatil',backref='order')
+    express = db.relationship('Express',backref='order')
+
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'uid':self.uid,
+            'uname':self.user.name,
+            'price':self.price,
+            'number':self.number,
+            'pay_status':self.pay_status,
+            'is_send':self.is_send,
+            'fapiao_title':self.fapiao_title,
+            'fapiao_content':self.fapiao_content,
+            'addrs':self.addrs
+        }
+
+
+class OrderDeatil(db.Model):
+    __tablename__ = 't_order_detail'
+    gid = db.Column(db.Integer,db.ForeignKey('t_goods.id'),primary_key=True)
+    oid = db.Column(db.Integer,db.ForeignKey('t_order.id'),primary_key=True)
+    number = db.Column(db.Integer)
+    price = db.Column(db.Float)
+    total_price = db.Column(db.Float)
+
+class Express(db.Model):
+    __tablename__ = 't_express'
+    id = db.Column(db.Integer,primary_key=True)
+    content = db.Column(db.String(64))
+    update_time = db.Column(db.String(32))
+    oid = db.Column(db.Integer, db.ForeignKey('t_order.id'))
+
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'content':self.content,
+            'update_time':self.update_time,
+            'oid':self.oid
+        }
