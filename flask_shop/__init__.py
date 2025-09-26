@@ -42,7 +42,13 @@ def create_app(config_name):
     # 注册goods蓝图
     from flask_shop.goods import goods as goods_bp
     app.register_blueprint(goods_bp)
-    return app
 
+    # 注册order蓝图
+    from flask_shop.order import order as order_bp
+    app.register_blueprint(order_bp)
+
+
+
+    return app
 
 
