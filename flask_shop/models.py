@@ -242,3 +242,36 @@ class GoodsAttr(db.Model):
 
     val = db.Column(db.String(512))
     _type = db.Column(db.String(8))
+
+class Order(db.Model,BaseModel):
+    __tablename__ = 't_order'
+    id = db.Column(db.Integer,primary_key=True)
+    uid = db.Column(db.Integer,db.ForeignKey('t_user.id'))
+    price = db.Column(db.Float)
+
+    number = db.Column(db.Integer)
+    pay_status = db.Column(db.Integer) #0:未支付,1:已支付
+    is_send = db.Column(db.Integer) # 0:未发货,1:已发货
+    fapiao_title = db.Column(db.String(32))
+    fapiao_company = db.Column(db.String(128))
+    fapiao_content = db.Column(db.String(512))
+    addrs = db.Column(db.String(512))
+
+    order_detail = db.relationship('OrderDeatil',backref='order')
+    express = db.relationship('Express',backref='order')
+
+
+class OrderDeatil(db.Model):
+    __tablename__ = 't_order_detail'
+    gid = db.Column(db.Integer,db.ForeignKey('t_goods.id'),primary_key=True)
+    oid = db.Column(db.Integer,db.ForeignKey('t_order.id'),primary_key=True)
+    number = db.Column(db.Integer)
+    price = db.Column(db.Float)
+    total_price = db.Column(db.Float)
+
+class Express(db.Model):
+    __tablename__ = 't_express'
+    id = db.Column(db.Integer,primary_key=True)
+    content = db.Column(db.String(64))
+    update_time = db.Column(db.String(32))
+    oid = db.Column(db.Integer, db.ForeignKey('t_order.id'))
