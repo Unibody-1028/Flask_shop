@@ -290,3 +290,11 @@ class Express(db.Model):
     content = db.Column(db.String(64))
     update_time = db.Column(db.String(32))
     oid = db.Column(db.Integer, db.ForeignKey('t_order.id'))
+
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'content':self.content,
+            'update_time':self.update_time,
+            'oid':self.oid
+        }
