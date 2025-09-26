@@ -1,9 +1,10 @@
-from flask import request
+from flask import request,current_app
 from flask_shop.goods import goods,goods_api     # 导入蓝图,Api实例
 from flask_shop import models,db
 from flask_restful import Resource
 from flask_shop.utils.message import to_dict_msg
-
+import hashlib
+from time import time
 
 @goods.route('/goods_list')
 def get_goods_list():
@@ -37,3 +38,32 @@ class Goods(Resource):
             return to_dict_msg(20000)
 
 goods_api.add_resource(Goods,'/goods')
+
+@goods.route('/upload_img',methods=['POST'])
+def upload_img():
+    img_file =  request.files.get('file')
+    if not img_file:
+        return to_dict_msg(10020)
+    if allowed_img(img_file.filename):
+        floder = current_app.config['SERVER_IMG_UPLOADS']
+        end_prefix = img_file.filename.rsplit('.',1)[1]
+        file_name = md5_file()
+
+        img_file.save(f'{floder}/{file_name}.{end_prefix}')
+        data={
+            'path':f'/static/img/{file_name}.{end_prefix}',
+            'url':f'http://127.0.0.1:8088/static/img/{file_name}.{end_prefix}'
+        }
+        return to_dict_msg(200,data,msg='上传图片成功')
+    else:
+        return to_dict_msg(10021)
+
+
+def allowed_img(filename):
+    return '.' in filename and filename.rsplit('.',1)[1] in current_app.config['ALLOWED_IMGS']
+
+def md5_file():
+    md5 = hashlib.md5()
+    md5.update(str(time()).encode())
+    file_name = md5.hexdigest()
+    return file_name
