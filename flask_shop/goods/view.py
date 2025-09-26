@@ -41,10 +41,10 @@ class Goods(Resource):
             price = request.form.get('price')
             weight = request.form.get('weight')
 
-            goods = Goods(
+            goods = models.Goods(
                 name=name,
-                attr_dynamic=attr_dynamic,
-                attr_static=attr_static,
+                price=price,
+                weight=weight,
                 cid_one=cid_one,
                 cid_two=cid_two,
                 cid_three=cid_three,
